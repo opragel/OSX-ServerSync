@@ -3,7 +3,9 @@
 lastUser=`defaults read /Library/Preferences/com.apple.loginwindow lastUserName`
 
 serverAddress='file.jehunw.com'
-serverDirectory='Science'
+serverDisk='Science'
+# Path below intended to be absolute - see rsync line
+serverDirectory='/Papers/Shared Library/'
 
 ping -c 1 $serverAddress
 if [ $? != 0 ]; then
@@ -11,18 +13,20 @@ if [ $? != 0 ]; then
 	exit 1
 fi
 
-mkdir -p /Volumes/$serverDirectory
-mountPoint=/Volumes/$serverDirectoy
+mkdir -p /Volumes/$serverDisk
+mountPoint=/Volumes/$serverDisk
+localDirectory="/Users/$lastUser/Documents/Secure Documents/Literature/Shared Library/"
 
 # Alternate AFP command, calls mount_afp.
 #open afp://$serverAddress/$serverFolder
-mount_afp -i afp://$serverAddress/$serverDirectory $mountPoint
+mount_afp -i afp://$serverAddress/$serverDisk $mountPoint
 
 if [ $? != 0 ]; then
 	echo "Could not authenticate/connect to the file server! If you continue to experience problems please contact an administrator."
+	
 	exit 2
 else
-	rsync -av "/Volumes/Science/Papers/Shared Library/" "/Users/$lastUser/Documents/Secure Documents/Literature/Shared Library/"
+	rsync -av "$mountPoint$serverDirectory" "$localDirecory"
 	if [ $? == 0 ]; then
 		echo "Transfer complete!"
 	else
