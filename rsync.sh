@@ -1,36 +1,48 @@
 #!/bin/sh
+clear
+echo 'OSX ServerSync V2'
 
 lastUser=`defaults read /Library/Preferences/com.apple.loginwindow lastUserName`
-
 serverAddress='example'
-serverDisk='example'
-# Path below intended to be absolute - see rsync line
-serverDirectory='example'
 
-ping -c 1 $serverAddress
+ping -c 1 $serverAddress > /dev/null 2>&1
 if [ $? != 0 ]; then
-	echo "Could not connect to the file server $serverAddress. Are you on the office network or VPN?"
+	echo "Server not found! Are you on the office network or VPN?"
 	exit 1
 fi
 
-mkdir -p /Volumes/$serverDisk
-mountPoint=/Volumes/$serverDisk
-localDirectory='example'
+serverDisk='example'
+serverDirectory='example' # Path below intended to be absolute - see rsync line
+mountPoint="/Volumes/$serverDisk"
+localDestination='example'
 
-# Alternate AFP command, calls mount_afp.
-#open afp://$serverAddress/$serverFolder
-mount_afp -i afp://$serverAddress/$serverDisk $mountPoint
+if [ ! -d $mountPoint ]; then	
+	open afp://$serverAddress/$serverDisk # Alternates: mount -t afp, mount_afp
+	sleep 8
+fi
 
-if [ $? != 0 ]; then
-	echo 'Could not authenticate/connect to the file server! If you continue to experience problems please contact an admin.'
+if [ ! -d $mountPoint ]; then
+	echo "Server failed to connect! Contact an admin if issue persists."
 	exit 2
+fi
+
+if find $mountPoint$serverDirectory -maxdepth 0 -empty | read v; then
+	isEmpty=1
+fi
+
+if [ "$isEmpty" == 1 ]; then
+	echo 'Remote folder is empty! If it is really not, contact an admin.'
+	exit 3
 else
-	rsync -av "$mountPoint$serverDirectory" "$localDirecory"
+	echo "Connected to server! Syncing"\
+	"$serverAddress/$serverDisk$serverDirectory to $localDestination..."
+	rsync -av "$mountPoint$serverDirectory" "$localDestination"
 	if [ $? == 0 ]; then
-		echo 'Transfer complete!'
+		echo "Transfer complete!"
 	else
-		echo 'Transfer failed!'
-		exit 3
+		echo "Transfer failed!"
+		exit 4
 	fi
 fi
+
 exit 0 
