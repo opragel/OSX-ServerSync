@@ -1,6 +1,6 @@
 #!/bin/sh
 clear
-echo 'OSX ServerSync V4'
+echo 'OSX ServerSync V5'
 
 displayNotification() {
   if [[ -z "$1" || -z "$2" ]]; then
@@ -55,11 +55,10 @@ if [ "$isEmpty" == 1 ]; then
   displayNotification "$emptyError" "$emptyErrorTitle"
 	exit 3
 else
-  confirmSync=`osascript << EOT
-  tell app "System Events"
+  osascript -e "tell app \"System Events\"
      Activate
-     display dialog "Synchronize and overwrite\n$serverAddress/$serverDisk$serverDirectory to\n$localDestination?" buttons {"OK", "Cancel"} default button 1 with title "Confirm folder synchronization?" with icon caution
-  end tell`
+     display dialog \"Synchronize and overwrite\n$serverAddress/$serverDisk$serverDirectory to\n$localDestination?\" buttons {\"OK\", \"Cancel\"} default button 1 with title \"Confirm folder synchronization?\" with icon caution
+  end tell"
   if [ $? == 0 ]; then
     displayNotification "Synchronizing $serverDisk$serverDirectory to $localDestination" "Transferring.."
     rsync -av "$mountPoint$serverDirectory" "$localDestination"
