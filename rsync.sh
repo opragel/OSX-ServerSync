@@ -24,7 +24,7 @@ emptyErrorTitle="Nothing to sync!"
 
 pingError="The server $serverAddress is not responding.\nAre you connected to the office network?"
 authError="Authentication to $serverAddress failed.\nContact an administrator if the issue persists."
-emptyError="Remote folder is empty! If incorrect and the issue persists, please contact an administrator.'"
+emptyError="Remote folder is empty! If incorrect and the issue persists, please contact an administrator."
 
 serverDisk='Science'
 serverDirectory='/test/' # Path below intended to be absolute - see rsync line
@@ -58,7 +58,7 @@ else
   osascript -e "tell app \"System Events\"
      Activate
      display dialog \"Synchronize and overwrite\n$serverAddress/$serverDisk$serverDirectory to\n$localDestination?\" buttons {\"OK\", \"Cancel\"} default button 1 with title \"Confirm folder synchronization?\" with icon caution
-  end tell"
+  end tell" > /dev/null 2>&1
   if [ $? == 0 ]; then
     displayNotification "Synchronizing $serverDisk$serverDirectory to $localDestination" "Transferring.."
     rsync -av "$mountPoint$serverDirectory" "$localDestination"
