@@ -18,18 +18,17 @@ displayNotification() {
 
 lastUser=`defaults read /Library/Preferences/com.apple.loginwindow lastUserName`
 serverAddress='file.jehunw.com'
-
-connectionErrorTitle="Connection Failure!"
-emptyErrorTitle="Nothing to sync!"
-
-pingError="The server $serverAddress is not responding.\nAre you connected to the office network?"
-authError="Authentication to $serverAddress failed.\nContact an administrator if the issue persists."
-emptyError="Remote folder is empty! If incorrect and the issue persists, please contact an administrator."
-
 serverDisk='Science'
 serverDirectory='/test/' # Path below intended to be absolute - see rsync line
 mountPoint="/Volumes/$serverDisk"
 localDestination="/Users/$lastUser/Documents/test/"
+
+connectionErrorTitle="Connection Failure!"
+emptyErrorTitle="Sync Error"
+
+pingError="The server $serverAddress is not responding.\nAre you connected to the office network?"
+authError="Authentication to $serverAddress failed.\nContact an administrator if the issue persists."
+emptyError="You do not have permission to view the folder. Please contact an administrator if issue persists."
 
 ping -c 1 $serverAddress > /dev/null 2>&1
 if [ $? != 0 ]; then
