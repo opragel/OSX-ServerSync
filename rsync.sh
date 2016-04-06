@@ -1,5 +1,4 @@
-#!/bin/sh
-clear
+#!/bin/bash
 echo 'OSX ServerSync V5'
 
 displayNotification() {
@@ -16,9 +15,9 @@ displayNotification() {
   return 0
 }
 
-lastUser=`defaults read /Library/Preferences/com.apple.loginwindow lastUserName`
-serverAddress='file.jehunw.com'
-serverDisk='Science'
+lastUser=$(defaults read /Library/Preferences/com.apple.loginwindow lastUserName)
+serverAddress='embarassed.contoso.com'
+serverDisk='MyCoolShareName'
 serverDirectory='/test/' # Path below intended to be absolute - see rsync line
 mountPoint="/Volumes/$serverDisk"
 localDestination="/Users/$lastUser/Documents/test/"
@@ -33,26 +32,26 @@ emptyError="You do not have permission to view the folder. Please contact an adm
 ping -c 1 $serverAddress > /dev/null 2>&1
 if [ $? != 0 ]; then
   displayNotification "$pingError" "$connectionErrorTitle"
-	exit 1
+    exit 1
 fi
 
-if [ ! -d $mountPoint ]; then	
-	open afp://$serverAddress/$serverDisk # Alternates: mount -t afp, mount_afp
-	sleep 8
+if [ ! -d $mountPoint ]; then   
+    open afp://$serverAddress/$serverDisk # Alternates: mount -t afp, mount_afp
+    sleep 8
 fi
 
 if [ ! -d $mountPoint ]; then
-	displayNotification "$authError" "$connectionErrorTitle"
-	exit 2
+    displayNotification "$authError" "$connectionErrorTitle"
+    exit 2
 fi
 
-if find $mountPoint$serverDirectory -maxdepth 0 -empty | read v; then
-	isEmpty=1
+if find $mountPoint$serverDirectory -maxdepth 0 -empty | read -r; then
+    isEmpty=1
 fi
 
 if [ "$isEmpty" == 1 ]; then
   displayNotification "$emptyError" "$emptyErrorTitle"
-	exit 3
+    exit 3
 else
   osascript -e "tell app \"System Events\"
      Activate
@@ -62,10 +61,10 @@ else
     displayNotification "Synchronizing $serverDisk$serverDirectory to $localDestination" "Transferring.."
     rsync -av "$mountPoint$serverDirectory" "$localDestination"
     if [ $? == 0 ]; then
-    	displayNotification "$serverAddress/$serverDisk$serverDirectory successfully transferred to $localDestination" "Transfer Complete!"
+        displayNotification "$serverAddress/$serverDisk$serverDirectory successfully transferred to $localDestination" "Transfer Complete!"
     else
-    	displayNotification "$serverDisk$serverDirectory failed to transfer." "Transfer Failed!"
-    	exit 4
+        displayNotification "$serverDisk$serverDirectory failed to transfer." "Transfer Failed!"
+        exit 4
     fi
   else
     displayNotification "Transfer cancelled by user." "Transfer cancelled."
