@@ -15,8 +15,8 @@ displayNotification() {
   return 0
 }
 
-lastUser=$(defaults read /Library/Preferences/com.apple.loginwindow lastUserName)
-serverAddress='embarassed.contoso.com'
+lastUser=$(python -c 'from SystemConfiguration import SCDynamicStoreCopyConsoleUser; import sys; username = (SCDynamicStoreCopyConsoleUser(None, None, None) or [None])[0]; username = [username,""][username in [u"loginwindow", None, u""]]; sys.stdout.write(username + "\n");')
+serverAddress='contoso.com'
 serverDisk='MyCoolShareName'
 serverDirectory='/test/' # Path below intended to be absolute - see rsync line
 mountPoint="/Volumes/$serverDisk"
@@ -72,4 +72,4 @@ else
   fi
 fi
 
-exit 0 
+exit 0
